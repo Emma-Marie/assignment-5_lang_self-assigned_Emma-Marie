@@ -3,6 +3,12 @@
 ## Description and purpose
 Self-assigned assignment for language analytics. A classifier trained on danish sermons to predicting the gender of the priest writing the specific sermon. This prediction is a binary classification problem with the seromns either having the label 1 for male or 2 for female. 
 
+What:
+- train model to predict pastor gender in seromns
+- save classification report
+- save trained model and vectorizer
+- get Shap values (and save visualisation of them?)
+
 ## Data
 The data used for this assignemnet is a corpus of 11,955 sermons by 95 pastors from the Evangelical Lutheran Church in Denmark. The data set contains different information about the pastors and the day the sermon was held, but for my classifier I only need the gender (1 = male, 2 = female), and the sermon content. 
 

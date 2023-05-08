@@ -38,6 +38,7 @@ def get_data():
                                                         y,          # classification labels
                                                         test_size=0.2,   # create an 80/20 split
                                                         random_state=42) # random state for reproducibility
+    
     return X_train, X_test, y_train, y_test, labels
 
 def sermon_vectorizer(X_train, X_test):
@@ -52,9 +53,6 @@ def sermon_vectorizer(X_train, X_test):
     # transform test data
     X_test_feats = vectorizer.transform(X_test)
 
-    # get feature names (nessecary?)
-    #feature_names = vectorizer.get_feature_names_out() 
-    
     return X_train_feats, X_test_feats, vectorizer
 
 def sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels):
