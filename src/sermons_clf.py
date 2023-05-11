@@ -7,7 +7,6 @@ import sys
 sys.path.append(".") # necessary if I don't use utils?
 # data munging tools
 import pandas as pd
-#import utils.classifier_utils as clf ### am I using this?
 # Machine learning stuff
 from sklearn.feature_extraction.text import CountVectorizer#, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
@@ -19,6 +18,8 @@ from joblib import dump, load
 # Shap values document classification
 import shap
 import tensorflow
+# Visualisation
+import matplotlib.pyplot as plt
 
 def get_data():
     # load sermons data
@@ -52,8 +53,10 @@ def sermon_vectorizer(X_train, X_test):
     X_train_feats = vectorizer.fit_transform(X_train)
     # transform test data
     X_test_feats = vectorizer.transform(X_test)
+    # get feature names
+    feature_names = vectorizer.get_feature_names_out()
 
-    return X_train_feats, X_test_feats, vectorizer
+    return X_train_feats, X_test_feats, vectorizer, feature_names
 
 def sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels):
     classifier = MLPClassifier(activation = "logistic",
@@ -67,21 +70,31 @@ def sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels):
     # clasification report
     classifier_metrics = metrics.classification_report(y_test, y_pred, target_names=labels )
     print(classifier_metrics)
-
+    
     return classifier, classifier_metrics
+    
+def shap_values(classifier, X_train_feats, X_test_feats, feature_names):
+    # Shap values
+    explainer = shap.KernelExplainer(classifier.predict, shap.sample(X_train_feats, 30))
+    shap_values = explainer.shap_values(shap.sample(X_test_feats, 30))
+    shap.summary_plot(shap_values, shap.sample(X_test_feats, 30), feature_names)
+    # Save shap values plot
+    shap_plot_path = os.path.join("out", "shap_plot.png")
+    plt.savefig(shap_plot_path)
 
 def main():
     # load and prepare data
     X_train, X_test, y_train, y_test, labels = get_data()
     print("Data prepared!")
-    
     # vectorize data
-    X_train_feats, X_test_feats, vectorizer = sermon_vectorizer(X_train, X_test)
+    X_train_feats, X_test_feats, vectorizer, feature_names = sermon_vectorizer(X_train, X_test)
     print("Data vectorized!")
-    
     # train classifier model
     classifier, classifier_metrics = sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels)
     print("Model trained!")
+    # shap values
+    shap_values(classifier, X_train_feats, X_test_feats, feature_names)
+    print("Shap values found and plot saved!")
 
     # Save classification report in "out"
     folder_path = os.path.join("out")
