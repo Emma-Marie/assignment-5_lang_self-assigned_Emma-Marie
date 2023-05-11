@@ -6,7 +6,6 @@ source ./sermons_env/bin/activate
 
 # requirements
 pip install --upgrade pip
-pip install --upgrade nbformat
 python3 -m pip install -r requirements.txt
 
 #deactivate the venv
