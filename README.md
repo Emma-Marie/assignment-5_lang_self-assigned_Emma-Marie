@@ -60,5 +60,8 @@ The script is run from the commandline by running the following commands:
 ## Discussion of results
 The model has an accuracy of 80% in predicting male and female pastors from their sermons. The shap value plot shows, that the most ...
 
+Shap plot: 
+The y-axis indicates the variable name, in order of importance from top to bottom (omformuler)
+
 ## References
 Centre-for-humanities-computing, Github: https://github.com/centre-for-humanities-computing/praedikener 
