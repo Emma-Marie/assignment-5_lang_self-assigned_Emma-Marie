@@ -48,7 +48,7 @@ def sermon_vectorizer(X_train, X_test):
                                 lowercase =  True,       # make everything lower case
                                 max_df = 0.95,           # remove very common words
                                 min_df = 0.05,           # remove very rare words
-                                max_features = 500)      # keep only top 500 features
+                                max_features = 100)      # keep only top 100 features
     # fit vectorizer to training data
     X_train_feats = vectorizer.fit_transform(X_train)
     # transform test data
