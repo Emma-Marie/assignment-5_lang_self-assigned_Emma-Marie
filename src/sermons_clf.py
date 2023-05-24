@@ -1,5 +1,4 @@
 # load data
-import pandas as pd
 import openpyxl
 # system tools
 import os
@@ -53,7 +52,7 @@ def sermon_vectorizer(X_train, X_test):
     # get feature names
     feature_names = vectorizer.get_feature_names_out()
     # save vectorizer
-    vec_outpath = os.path.join("models", "sermon_vectorizer.joblib")
+    vec_outpath = os.path.join("models", "sermon_gender_vectorizer.joblib")
     dump(vectorizer, vec_outpath)
     print("Vectorizer saved")
 
@@ -88,7 +87,7 @@ def sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels):
         f.write(classifier_report)
     print("Classification report saved")
     # save classifier
-    clf_outpath = os.path.join("models", "sermon_gender_clf")
+    clf_outpath = os.path.join("models", "sermon_gender_clf.joblib")
     dump(classifier, clf_outpath)
     print("Trained model saved!")
     
