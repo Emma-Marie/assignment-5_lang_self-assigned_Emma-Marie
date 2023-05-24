@@ -15,9 +15,6 @@ from sklearn.model_selection import train_test_split, ShuffleSplit
 from sklearn import metrics
 # save model and vectorizer
 from joblib import dump, load
-# Shap values document classification
-import shap
-import tensorflow
 # Visualisation
 import matplotlib.pyplot as plt
 
@@ -55,6 +52,10 @@ def sermon_vectorizer(X_train, X_test):
     X_test_feats = vectorizer.transform(X_test)
     # get feature names
     feature_names = vectorizer.get_feature_names_out()
+    # save vectorizer
+    vec_outpath = os.path.join("models", "sermon_vectorizer.joblib")
+    dump(vectorizer, vec_outpath)
+    print("Vectorizer saved")
 
     return X_train_feats, X_test_feats, vectorizer, feature_names
 
@@ -67,20 +68,31 @@ def sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels):
     classifier.fit(X_train_feats, y_train)
     # Get predictions
     y_pred = classifier.predict(X_test_feats)
+    # Evaluation with confusion matrix 
+    confusion_metrix = metrics.ConfusionMatrixDisplay.from_estimator(classifier,# the classifier name
+                                                X_train_feats,          
+                                                y_train,                # the training labels
+                                                cmap=plt.cm.Blues,      # make the colours prettier
+                                                labels=[1, 2])# the labels in your data arranged alphabetically
+    # save confusion metrix
+    metrix_path = os.path.join("out", "confusion_matrix.png")
+    plt.savefig(metrix_path)
     # clasification report
-    classifier_metrics = metrics.classification_report(y_test, y_pred, target_names=labels )
-    print(classifier_metrics)
+    classifier_report = metrics.classification_report(y_test, y_pred, target_names=labels )
+    print(classifier_report)
+    # Save classification report in "out"
+    folder_path = os.path.join("out")
+    file_name = "classificationreport.txt"
+    file_path = os.path.join(folder_path, file_name)
+    with open(file_path, "w") as f: #"writing" classifier report and saving it
+        f.write(classifier_report)
+    print("Classification report saved")
+    # save classifier
+    clf_outpath = os.path.join("models", "sermon_gender_clf")
+    dump(classifier, clf_outpath)
+    print("Trained model saved!")
     
-    return classifier, classifier_metrics
-    
-def shap_values(classifier, X_train_feats, X_test_feats, feature_names):
-    # Shap values
-    explainer = shap.KernelExplainer(classifier.predict, shap.sample(X_train_feats, 30))
-    shap_values = explainer.shap_values(shap.sample(X_test_feats, 30))
-    shap.summary_plot(shap_values, shap.sample(X_test_feats, 30), feature_names)
-    # Save shap values plot
-    shap_plot_path = os.path.join("out", "shap_plot.png")
-    plt.savefig(shap_plot_path)
+    return classifier, classifier_report
 
 def main():
     # load and prepare data
@@ -90,26 +102,8 @@ def main():
     X_train_feats, X_test_feats, vectorizer, feature_names = sermon_vectorizer(X_train, X_test)
     print("Data vectorized!")
     # train classifier model
-    classifier, classifier_metrics = sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels)
+    classifier, classifier_report = sermon_classifier(X_train_feats, X_test_feats, y_train, y_test, labels)
     print("Model trained!")
-    # shap values
-    shap_values(classifier, X_train_feats, X_test_feats, feature_names)
-    print("Shap values found and plot saved!")
-
-    # Save classification report in "out"
-    folder_path = os.path.join("out")
-    file_name = "classificationreport.txt"
-    file_path = os.path.join(folder_path, file_name)
-    with open(file_path, "w") as f: #"writing" classifier report and saving it
-        f.write(classifier_metrics)
-    # save vectorizer
-    vec_outpath = os.path.join("models", "sermon_vectorizer.joblib")
-    dump(vectorizer, vec_outpath)
-    # save classifier
-    clf_outpath = os.path.join("models", "sermon_gender_clf")
-    dump(classifier, clf_outpath)
-    
-    print("Models and report saved!")
 
 if __name__ == "__main__":
     main()
