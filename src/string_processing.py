@@ -4,6 +4,7 @@ import string
 from collections import Counter, OrderedDict
 import pandas as pd
 import argparse
+import csv
 
 def input_parse():
     #initialie the parser
@@ -42,10 +43,13 @@ def clean_data(corpus_series, corpus_name):
     corpus_str = corpus_series.to_string(index=False)
     # cleaning text using regex
     corpus_str = corpus_str.replace("\\n", " ")
-    # cleaning text using regex
-    corpus_str = corpus_str.replace("\t", " ")
+    corpus_str = corpus_str.replace("\\t", " ")
     # turn every token lowercase
     corpus_str = corpus_str.lower()
+    # Remove special characters except hyphen
+    corpus_str = re.sub(r'[^a-zA-Z0-9æøåÆØÅ ]', '', corpus_str)
+    print(repr(corpus_str))
+
     # split tokens
     tokens = corpus_str.split()
     # clean tokens by removing punctuation etc. 
@@ -54,6 +58,7 @@ def clean_data(corpus_series, corpus_name):
         stripped = token.strip(string.punctuation)
         if not stripped == "":
             clean_tokens.append(stripped)
+
     # Assign name to the clean tokens based on the corpus name
     clean_tokens_name = f"clean_tokens_{corpus_name}"
     globals()[clean_tokens_name] = clean_tokens
@@ -81,9 +86,15 @@ def save_context_data(context_data, keyword, corpus_name):
     os.makedirs(keyword_folder, exist_ok=True)  # Create the keyword subfolder if it doesn't exist
     context_path = os.path.join(keyword_folder, f"context_{keyword}_{corpus_name}.csv")
 
-    with open(context_path, "a") as file:
+    #with open(context_path, "a") as file:
+    #    for context in context_data:
+    #        file.write("{:50} {:20} {:50}\n".format(*context))
+
+
+    with open(context_path, "w", newline='', encoding='utf-8') as file:
         for context in context_data:
             file.write("{:50} {:20} {:50}\n".format(*context))
+
     print(f"The context of {keyword} in {corpus_name} is saved")
 
 def keyword_context(clean_tokens_male, clean_tokens_female, args):
