@@ -6,6 +6,10 @@ import pandas as pd
 import argparse
 import csv
 
+# Data paths
+DATA_path = os.path.join("..", "..", "768706", "data", "content.dat")
+META_path = os.path.join("..", "..", "768706", "metadata", "Joined_Meta.xlsx")
+
 def input_parse():
     #initialie the parser
     parser = argparse.ArgumentParser()
@@ -23,20 +27,22 @@ def get_data(data_path, meta_path):
     meta = pd.read_excel(meta_path)
     # merge data and metadata on document IDs
     full_data = data.merge(meta, left_on="id", right_on="ID-dok")
+    return full_data
+    
     # Create empty Series for male and female corpora
-    male_corpus_series = pd.Series()
-    female_corpus_series = pd.Series()
+    #male_corpus_series = pd.Series()
+    #female_corpus_series = pd.Series()
 
-    for index, row in full_data.iterrows():
-        if row["køn"] == 1:
-            male_corpus_series[index] = row["content"]
-        elif row["køn"] == 2:
-            female_corpus_series[index] = row["content"]
+    #for index, row in full_data.iterrows():
+    #    if row["køn"] == 1:
+    #        male_corpus_series[index] = row["content"]
+    #    elif row["køn"] == 2:
+    #        female_corpus_series[index] = row["content"]
 
-    print(f"Length of male corpus is {len(male_corpus_series)}")
-    print(f"Length of female corpus is {len(female_corpus_series)}")
+    #print(f"Length of male corpus is {len(male_corpus_series)}")
+    #print(f"Length of female corpus is {len(female_corpus_series)}")
 
-    return male_corpus_series, female_corpus_series
+    #return male_corpus_series, female_corpus_series
 
 def clean_data(corpus_series, corpus_name):
     # cleaning text using regex
@@ -48,7 +54,6 @@ def clean_data(corpus_series, corpus_name):
     corpus_str = corpus_str.lower()
     # Remove special characters except hyphen
     corpus_str = re.sub(r'[^a-zA-Z0-9æøåÆØÅ ]', '', corpus_str)
-    print(repr(corpus_str))
 
     # split tokens
     tokens = corpus_str.split()
@@ -86,11 +91,6 @@ def save_context_data(context_data, keyword, corpus_name):
     os.makedirs(keyword_folder, exist_ok=True)  # Create the keyword subfolder if it doesn't exist
     context_path = os.path.join(keyword_folder, f"context_{keyword}_{corpus_name}.csv")
 
-    #with open(context_path, "a") as file:
-    #    for context in context_data:
-    #        file.write("{:50} {:20} {:50}\n".format(*context))
-
-
     with open(context_path, "w", newline='', encoding='utf-8') as file:
         for context in context_data:
             file.write("{:50} {:20} {:50}\n".format(*context))
@@ -103,23 +103,6 @@ def keyword_context(clean_tokens_male, clean_tokens_female, args):
     context_data_female = get_keyword_context(clean_tokens_female, keyword)
     save_context_data(context_data_male, keyword, "male")
     save_context_data(context_data_female, keyword, "female")
-
-    return keyword
-
-    # find sentences in which the chosen word appears
-    #keyword_sentences = []
-    #sentences = re.split(r'[.?!]\s*', corpus_str) # split corpus into sentences by periods, questionmarks and excalmation marks
-    #for idx, sentence in enumerate(sentences): # track index for each sentence
-    #    if keyword in sentence: # print sentence, if the keyword is in it. 
-    #        keyword_sentences.append((idx, sentence))
-    #        #print(idx, "\t", sentence)
-    ## save sentences with keyword in csv file
-    #sentences_df = pd.DataFrame(keyword_sentences, columns=['sentence number', 'sentence'])
-    #df_path = os.path.join("out", f"sentences_{keyword}.csv")
-    #sentences_df.to_csv(df_path)
-    #print(f"Sentences with {keyword} is saved")
-
-    return keyword
 
 def get_cooccurring_tokens(clean_tokens, args, keyword, corpus_name):
     # Remove stopwords
@@ -149,11 +132,15 @@ def get_cooccurring_tokens(clean_tokens, args, keyword, corpus_name):
 
 def main():
     args = input_parse()
-    # set data path
-    sermon_data_path = os.path.join("..", "..", "768706", "data", "content.dat")
-    sermon_meta_path = os.path.join("..", "..", "768706", "metadata", "Joined_Meta.xlsx")
     # load and process data
-    male_corpus_series, female_corpus_series = get_data(sermon_data_path, sermon_meta_path)
+    full_data = get_data(DATA_path, META_path)
+    
+    # Split data into male and female corpora
+    male_corpus_series = full_data.loc[full_data["køn"] == 1, "content"]
+    female_corpus_series = full_data.loc[full_data["køn"] == 2, "content"]
+    print(f"Length of male corpus is {len(male_corpus_series)}")
+    print(f"Length of female corpus is {len(female_corpus_series)}")
+    
     # tokenize and clean data
     clean_tokens_male = clean_data(male_corpus_series, "male")
     clean_tokens_female = clean_data(female_corpus_series, "female")
@@ -164,7 +151,6 @@ def main():
     print(f"{args.keyword} appears {count_female} times in the female corpus")
     # find sentences in which keyword appears
     keyword_context(clean_tokens_male, clean_tokens_female, args)
-    # keyword = keyword_context(corpus_str, clean_tokens, args)
     # find and count tokens co-occurring with keyword
     cooccurring_tokens_male = get_cooccurring_tokens(clean_tokens_male, args, args.keyword, "male")
     cooccurring_tokens_female = get_cooccurring_tokens(clean_tokens_female, args, args.keyword, "female")
