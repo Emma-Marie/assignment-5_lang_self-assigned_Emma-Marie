@@ -7,10 +7,8 @@ import argparse
 import csv
 
 # Data paths
-DATA_path = os.path.join("..", "..", "768706", "data", "content.dat")
-#DATA_path = os.path.join("..", "768706", "data", "content.dat")
-META_path = os.path.join("..", "..", "768706", "metadata", "Joined_Meta.xlsx")
-#META_path = os.path.join("..", "768706", "metadata", "Joined_Meta.xlsx")
+DATA_path = os.path.join("..", "768706", "data", "content.dat")
+META_path = os.path.join("..", "768706", "metadata", "Joined_Meta.xlsx")
 
 def input_parse():
     #initialie the parser
@@ -60,6 +58,7 @@ def clean_data(corpus_series, corpus_name):
 
 # define keyword counter
 def count_keyword(clean_tokens, keyword):
+    # count how many times keyword token appears among the tokens
     count = clean_tokens.count(keyword)
     return count
 
@@ -92,8 +91,15 @@ def save_context_data(context_data, keyword, corpus_name):
 
     print(f"The context of {keyword} in {corpus_name} is saved")
 
+def save_keyword_sentences(keyword_sentences, keyword):
+    df_path = os.path.join("out", f"sentences_{keyword}.csv")
+    sentences_df = pd.DataFrame(keyword_sentences, columns=['sentence number', 'sentence'])
+    sentences_df.to_csv(df_path)
+    print(f"Sentences with {keyword} are saved")
+
+# find the context before and after the keyword token
 def keyword_context(clean_tokens_male, clean_tokens_female, args):
-    # set keywor dto the argparsed word
+    # set keyword to the argparsed word
     keyword = args.keyword
     # find context of keyword in male corpus
     context_data_male = get_keyword_context(clean_tokens_male, keyword)
@@ -103,9 +109,10 @@ def keyword_context(clean_tokens_male, clean_tokens_female, args):
     save_context_data(context_data_male, keyword, "male")
     save_context_data(context_data_female, keyword, "female")
 
+#define function to find the x number of tokens most likely to co-occur with the keyword
 def get_cooccurring_tokens(clean_tokens, args, keyword, corpus_name):
     # Remove stopwords from stopword list
-    with open("danish_stopwords.txt", "r") as file:
+    with open("stopord.txt", "r") as file:
         stopwords = [line.strip() for line in file]
     tokens_no_stopwords = [token for token in clean_tokens if token not in stopwords]
     # choose the number of co-occurrence
