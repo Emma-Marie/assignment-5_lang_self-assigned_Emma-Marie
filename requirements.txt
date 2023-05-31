@@ -1,14 +1,6 @@
-pandas==2.0.1
-openpyxl==3.1.2
-numpy
-matplotlib==3.7.1
-seaborn
+pandas==2.0.1 
+openpyxl==3.1.2 
+matplotlib==3.7.1 
 scikit_learn==1.2.2
-tensorflow==2.12.0
-sklearn_rvm
 argparse
-
-joblib==1.2.0
-
-# For string processing script
-regex
+joblib 
