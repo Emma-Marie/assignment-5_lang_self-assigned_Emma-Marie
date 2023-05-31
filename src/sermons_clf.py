@@ -16,10 +16,8 @@ from joblib import dump
 # Visualisation
 import matplotlib.pyplot as plt
 
-sermon_path = os.path.join("..", "..", "768706", "data", "content.dat")
-#sermon_path = os.path.join("..", "768706", "data", "content.dat")
-meta_sermon_path = os.path.join("..", "..", "768706", "metadata", "Joined_Meta.xlsx")
-#meta_path = os.path.join("..", "768706", "metadata", "Joined_Meta.xlsx")
+sermon_path = os.path.join("..", "768706", "data", "content.dat")
+meta_path = os.path.join("..", "768706", "metadata", "Joined_Meta.xlsx")
 
 def get_data(data_path, meta_path):
     # load sermons data
