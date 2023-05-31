@@ -64,7 +64,7 @@ __Further notes__: I am aware, that my conclusions are very weak, and that I onl
 ”Danish Sermons”, Center for Humanities Computing Aarhus, GitHub: 
 https://github.com/centre-for-humanities-computing/praedikener
 
-Centre-for-humanities-computing, Github: https://github.com/centre-for-humanities-computing/praedikener 
+“praedikener”, Centre-for-humanities-computing, GitHub: https://github.com/centre-for-humanities-computing/praedikener 
 
 "stopord.txt": https://gist.github.com/berteltorp/0cf8a0c7afea7f25ed754f24cfc2467b
 
